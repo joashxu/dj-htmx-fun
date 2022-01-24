@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% load render_table from django_tables2 %}
+{% load i18n %}
+
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col-2">
+            <div class="toc mt4 mb-5 text-muted">
+                <strong class="d-block h6 my-2 pb-2 border-bottom">Pages</strong>
+                <nav class="toc">
+                    <ul>
+                        <li class="{% block html_table %}{% endblock %}"><a href="{% url 'tables:products' %}">HTML table</a></li>
+                        <li class="{% block simple_htmx_table %}{% endblock %}"><a href="{% url 'tables:products_htmx' %}">Simple HTMx table</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="col-10">
+            {% block table_main %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

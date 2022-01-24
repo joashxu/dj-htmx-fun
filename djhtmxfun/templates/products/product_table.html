@@ -1,0 +1,11 @@
+{% extends "products/base.html" %}
+
+{% load render_table from django_tables2 %}
+{% load i18n %}
+
+{% block html_table %}active{% endblock %}
+
+{% block table_main %}
+<h1>Product table</h1>
+{% render_table table %}
+{% endblock %}

@@ -1,0 +1,57 @@
+/* Table of content */
+.toc nav ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+.toc nav li {
+    margin-bottom: 0.25rem;
+}
+
+.toc nav a:not(:hover) {
+    text-decoration: none;
+}
+
+.toc nav a {
+    color: inherit;
+}
+
+.toc nav li.active a{
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+
+/* Table column width */
+.table-container td:nth-child(1) {
+    width: 5%;
+}
+
+.table-container td:nth-child(2) {
+    width: 36%;
+}
+
+.table-container td:nth-child(3) {
+    width: 34%;
+}
+
+.table-container td:nth-child(4),
+.table-container td:nth-child(5),
+.table-container td:nth-child(6) {
+    width: 8%;
+}
+
+/* Table sorting icon */
+.table-container th.asc:after {
+    content: '\0000a0\0025b2';
+    float: right;
+    width: inherit;
+}
+
+.table-container th.desc:after {
+    content: '\0000a0\0025bc';
+    float: right;
+    width: inherit;
+}
+
+

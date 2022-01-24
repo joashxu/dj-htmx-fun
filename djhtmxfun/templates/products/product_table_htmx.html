@@ -1,0 +1,19 @@
+{% extends "products/base.html" %}
+
+{% load render_table from django_tables2 %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block simple_htmx_table %}active{% endblock %}
+
+{% block table_main %}
+    <h1>Product table</h1>
+
+    <form hx-get="{% url 'tables:products_htmx' %}" hx-target="#table-container" hx-swap="outerHTML" class="form-inline">
+        <div class="d-flex justify-content-end">
+            {% crispy filter.form %}
+        </div>
+    </form>
+
+    {% render_table table %}
+{% endblock %}

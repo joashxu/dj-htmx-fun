@@ -1,0 +1,84 @@
+{% load django_tables2 %}
+{% load i18n %}
+
+{% block table-wrapper %}
+    <div class="table-body-container">
+        {% block table %}
+            <table {% render_attrs table.attrs class="table" %}>
+                {% block table.thead %}{% endblock table.thead %}
+
+                {% block table.tbody %}
+                    <tbody id="body-target" {{ table.attrs.tbody.as_html }}>
+                    {% for row in table.paginated_rows %}
+                        {% block table.tbody.row %}
+                            <tr {{ row.attrs.as_html }}>
+                                {% for column, cell in row.items %}
+                                    <td {{ column.attrs.td.as_html }}>{% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}{{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endblock table.tbody.row %}
+                    {% empty %}
+                        {% if table.empty_text %}
+                            {% block table.tbody.empty_text %}
+                                <tr><td colspan="{{ table.columns|length }}">{{ table.empty_text }}</td></tr>
+                            {% endblock table.tbody.empty_text %}
+                        {% endif %}
+                    {% endfor %}
+                    </tbody>
+                {% endblock table.tbody %}
+                {% block table.tfoot %}
+                    {% if table.has_footer %}
+                        <tfoot {{ table.attrs.tfoot.as_html }}>
+                        <tr>
+                            {% for column in table.columns %}
+                                <td {{ column.attrs.tf.as_html }}>{{ column.footer }}</td>
+                            {% endfor %}
+                        </tr>
+                        </tfoot>
+                    {% endif %}
+                {% endblock table.tfoot %}
+            </table>
+        {% endblock table %}
+
+        {% block pagination %}
+            {% if table.page and table.paginator.num_pages > 1 %}
+                <nav aria-label="Table navigation">
+            <ul class="pagination justify-content-end">
+                {% if table.page.has_previous %}
+                {% block pagination.previous %}
+                <li class="previous page-item" role="button">
+                    <div @click="page_by = {{table.page.previous_page_number}}"
+                         class="page-link">
+                        <span aria-hidden="true">&laquo;</span>
+                        {% trans 'previous' %}
+                    </div>
+                </li>
+                {% endblock pagination.previous %}
+                {% endif %}
+                {% if table.page.has_previous or table.page.has_next %}
+                {% block pagination.range %}
+                {% for p in table.page|table_page_range:table.paginator %}
+                <li class="page-item{% if table.page.number == p %} active{% endif %}" role="button">
+                    <div class="page-link" {% if p != '...' %}@click="page_by={{p}}"{% endif %}>
+                        {{ p }}
+                    </div>
+                </li>
+                {% endfor %}
+                {% endblock pagination.range %}
+                {% endif %}
+                {% if table.page.has_next %}
+                {% block pagination.next %}
+                <li class="next page-item user-select" role="button">
+                    <div @click="page_by = {{table.page.next_page_number}}" class="page-link">
+                        {% trans 'next' %}
+                        <span aria-hidden="true">&raquo;</span>
+                    </div>
+                </li>
+                {% endblock pagination.next %}
+                {% endif %}
+            </ul>
+        </nav>
+            {% endif %}
+        {% endblock pagination %}
+    </div>
+{% endblock table-wrapper %}

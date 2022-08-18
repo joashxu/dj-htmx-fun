@@ -1,0 +1,64 @@
+{% extends "products/base.html" %}
+
+{% load render_table from django_tables2 %}
+{% load i18n %}
+{% load django_tables2 %}
+{% load crispy_forms_tags %}
+
+{% block multi_htmx_table %}active{% endblock %}
+
+{% block table_main %}
+<h1>Product table</h1>
+
+<div id="table-container" class="table-container">
+
+    <form class="form-inline"
+          hx-get="{% url 'tables:products_htmx_multicol' %}"
+          hx-target=".table-body-container"
+          hx-trigger="input, select, sort-initiated, pagination-initiated"
+          hx-swap="outerHTML"
+          hx-indicator=".progress"
+          x-data="{ sort_by: '', page_by: 1 }">
+
+        <input type="hidden" name="sort" x-ref="sort_input" x-model="sort_by"
+                x-init="$watch('sort_by',
+                        () => $refs.sort_input.dispatchEvent(
+                                new Event('sort-initiated', { bubbles: true })))">
+
+        <input type="hidden" name="page" x-ref="paginate_input" x-model="page_by"
+               x-init="$watch('page_by',
+                        () => $refs.paginate_input.dispatchEvent(
+                                new Event('pagination-initiated', { bubbles: true })))" >
+
+        <table {% render_attrs table.attrs class="table multi-col-header" %}>
+            <thead {{ table.attrs.thead.as_html }}>
+                <tr>
+                    {% for column in table.columns %}
+                    <th {{ column.attrs.th.as_html }}
+                        x-data="{ col_name: '{{ column.order_by_alias }}',
+                                  toggle(event) {
+                                    this.col_name = this.col_name.startsWith('-') ? this.col_name.substring(1) : ('-' + this.col_name);
+                                    sort_by = this.col_name;}}"
+                        @click="toggle()"
+                        :class="sort_by !== '' ? (sort_by === col_name ? (sort_by.startsWith('-') ? 'desc' : 'asc') : '') : ''"
+                        style="cursor: pointer;">
+                        {{ column.header }}
+                    </th>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    {% for field in filter.form %}
+                    <td>{{ field|as_crispy_field }}</td>
+                    {% endfor %}
+                </tr>
+            </thead>
+        </table>
+
+        <div class="progress">
+            <div class="indeterminate"></div>
+        </div>
+
+        {% render_table table %}
+    </form>
+</div>
+{% endblock %}

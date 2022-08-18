@@ -13,3 +13,10 @@ class ProductHTMxTable(tables.Table):
     class Meta:
         model = Product
         template_name = "tables/bootstrap_htmx_full.html"
+
+
+class ProductHTMxMultiColumnTable(tables.Table):
+    class Meta:
+        model = Product
+        show_header = False
+        template_name = "tables/bootstrap_col_filter.html"

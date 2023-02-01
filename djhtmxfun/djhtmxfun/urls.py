@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('__debug__/', include('debug_toolbar.urls')),
 
     path("", TemplateView.as_view(template_name="home.html")),
     path("table/", include(("products.urls", "products"), namespace="tables")),

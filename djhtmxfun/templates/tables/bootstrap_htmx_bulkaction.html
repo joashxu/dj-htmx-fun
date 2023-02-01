@@ -1,0 +1,34 @@
+{% extends "django_tables2/bootstrap4.html" %}
+
+{% load django_tables2 %}
+{% load i18n %}
+
+{% block pagination.previous %}
+<li class="previous page-item" role="button">
+    <div @click="page_by = {{table.page.previous_page_number}}"
+         class="page-link">
+        <span aria-hidden="true">&laquo;</span>
+        {% trans 'previous' %}
+    </div>
+</li>
+{% endblock pagination.previous %}
+
+{% block pagination.range %}
+{% for p in table.page|table_page_range:table.paginator %}
+<li class="page-item{% if table.page.number == p %} active{% endif %}" role="button">
+    <div class="page-link" {% if p != '...' %}@click="page_by={{p}}"{% endif %}>
+        {{ p }}
+    </div>
+</li>
+{% endfor %}
+{% endblock pagination.range %}
+
+
+{% block pagination.next %}
+<li class="next page-item user-select" role="button">
+    <div @click="page_by = {{table.page.next_page_number}}" class="page-link">
+        {% trans 'next' %}
+        <span aria-hidden="true">&raquo;</span>
+    </div>
+</li>
+{% endblock pagination.next %}

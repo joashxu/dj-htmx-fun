@@ -1,6 +1,6 @@
 django
 crispy-bootstrap5==0.6
 django-crispy-forms==1.14.0
-django-filter==22.1
-django-htmx==1.12.0
-django-tables2==2.4.1
+django-filter
+django-htmx
+django-tables2

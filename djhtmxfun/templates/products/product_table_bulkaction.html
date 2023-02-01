@@ -1,0 +1,150 @@
+{% extends "products/base.html" %}
+
+{% load render_table from django_tables2 %}
+{% load i18n %}
+{% load django_tables2 %}
+
+{% block bulkaction_table %}active{% endblock %}
+
+{% block table_main %}
+<h1>Product Table</h1>
+
+<div class="table-top-container">
+    {# Bulk actions and searh bar #}
+    <div class="row justify-content-between">
+        <div class="col-4">
+            <div>
+                <button id="activate" type="submit" name="activate" class="btn btn-secondary"
+                        hx-post="{% url 'tables:products_htmx_bulkaction_update' %}"
+                        hx-target=".table-container"
+                        hx-indicator=".progress"
+                        hx-include="#bulk-actions, #id_query">
+                    Activate
+                </button>
+                <button id="deactivate" type="submit" name="deactivate" class="btn btn-secondary"
+                        hx-post="{% url 'tables:products_htmx_bulkaction_update' %}"
+                        hx-target=".table-container"
+                        hx-indicator=".progress"
+                        hx-include="#bulk-actions, #id_query">
+                    Deactivate
+                </button>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-inline">
+                <div class="d-flex justify-content-end">
+                    <input type="search" name="query" placeholder="Search..."
+                           class="searchinput form-control" id="id_query"
+                           hx-trigger="keyup changed delay:500ms, search"
+                           hx-get="{% url 'tables:products_htmx_bulkaction' %}"
+                           hx-indicator=".progress"
+                           hx-target=".table-container"
+                           x-data
+                           x-on:htmx:before-request="$dispatch('clear-pagination-and-sort')"
+>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Table header #}
+    <form id="bulk-actions"
+          hx-get="{% url 'tables:products_htmx_bulkaction' %}"
+          hx-target=".table-container"
+          hx-trigger="sort-initiated, pagination-initiated"
+          hx-swap="outerHTML"
+          hx-include="#id_query"
+          hx-indicator=".progress"
+          x-data="{ sort_by: '',
+                    page_by: 1,
+                    select_all: false,
+                    last_checked: false
+                  }"
+          @clear-pagination-and-sort.window="page_by = 1; sort_by = ''"
+          x-on:htmx:after-swap="select_all = false">
+
+        {% csrf_token %}
+
+        {# Hidden input to store pagination page and column to sort by #}
+        <input type="hidden" name="sort" x-ref="sort_input" x-model="sort_by"
+                x-init="$watch('sort_by',
+                        () => $refs.sort_input.dispatchEvent(
+                                new Event('sort-initiated', { bubbles: true })))">
+
+        <input type="hidden" name="page" x-ref="paginate_input" x-model="page_by"
+                x-init="$watch('page_by',
+                        () => $refs.paginate_input.dispatchEvent(
+                                new Event('pagination-initiated', { bubbles: true })))">
+
+        <table class="table checkcolumn-table header">
+            <thead {{ table.attrs.thead.as_html }}>
+                <tr>
+                    {% for column in table.columns %}
+                        {% if column.name == 'selection' %}
+                            <th {{ column.attrs.th.as_html }}
+                                x-data="{ toggleSelection(event) {
+                                            select_all = !select_all;
+                                            let checkboxes = document.getElementsByName('selection');
+                                            [...checkboxes].map((el) => {
+                                                el.checked = select_all;
+                                            })
+                                          }
+                                        }"
+                                @click="toggleSelection()"
+                                style="cursor: pointer;">
+                                <input type="checkbox" x-model="select_all">
+                                </th>
+                        {% else %}
+                            {% if column.orderable %}
+                            <th {{ column.attrs.th.as_html }}
+                                x-data="{ col_name: '{{ column.order_by_alias }}',
+                                          toggleSort(event) {
+                                            this.col_name = this.col_name.startsWith('-') ? this.col_name.substring(1) : ('-' + this.col_name);
+                                            sort_by = this.col_name;
+                                          }
+                                        }"
+                                @click="toggleSort()"
+                                :class="sort_by !== '' ? (sort_by === col_name ? (sort_by.startsWith('-') ? 'desc' : 'asc') : '') : ''"
+                                style="cursor: pointer;">
+                                {{ column.header }}
+                            </th>
+                            {% else %}
+                                <th {{ column.attrs.th.as_html }}>{{ column.header }}</th>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+        </table>
+
+        {# Progress indicator #}
+        <div class="progress">
+            <div class="indeterminate"></div>
+        </div>
+
+        {# Content table #}
+        {% render_table table %}
+    </form>
+</div>
+{% endblock %}
+
+{% block footer %}
+<script>
+    // Set the checkbox to be checked from the start to end when user press shift key
+    function checkRange(event) {
+        let checkboxes = document.getElementsByName('selection');
+        let inBetween =  false;
+        if( event.shiftKey && event.target.checked ) {
+            checkboxes.forEach( checkbox => {
+                if( checkbox === event.target || checkbox === last_checked ) {
+                    inBetween = !inBetween;
+                }
+                if( inBetween ) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+        last_checked = event.target;
+    }
+</script>
+{% endblock %}

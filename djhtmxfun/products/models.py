@@ -13,5 +13,8 @@ class Product(models.Model):
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.PositiveSmallIntegerField(choices=Status.choices)
 
+    class Meta:
+        ordering = ("pk",)
+
     def __str__(self):
         return self.name

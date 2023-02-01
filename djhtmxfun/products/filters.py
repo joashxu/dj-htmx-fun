@@ -5,14 +5,18 @@ from django.db.models import Q
 from django.forms import TextInput
 import django_filters
 
-from products.models import Product
+from .models import Product
+
+
+class SearchInput(TextInput):
+    input_type = "search"
 
 
 class ProductUniversalFilter(django_filters.FilterSet):
     query = django_filters.CharFilter(
         method="universal_search",
         label="",
-        widget=TextInput(attrs={"placeholder": "Search..."}),
+        widget=SearchInput(attrs={"placeholder": "Search..."}),
     )
 
     class Meta:

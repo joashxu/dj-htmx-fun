@@ -14,6 +14,7 @@
                         <li class="{% block html_table %}{% endblock %}"><a href="{% url 'tables:products' %}">HTML table</a></li>
                         <li class="{% block simple_htmx_table %}{% endblock %}"><a href="{% url 'tables:products_htmx' %}">Simple HTMx table</a></li>
                         <li class="{% block multi_htmx_table %}{% endblock %}"><a href="{% url 'tables:products_htmx_multicol' %}">Multi Filter HTMx table</a></li>
+                        <li class="{% block bulkaction_table %}{% endblock %}"><a href="{% url 'tables:products_htmx_bulkaction' %}">Bulk Action</a></li>
                     </ul>
                 </nav>
             </div>
